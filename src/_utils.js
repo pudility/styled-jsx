@@ -19,8 +19,6 @@ const or = (a, b) => t.logicalExpression('||', a, b)
 
 const joinSpreads = spreads => spreads.reduce((acc, curr) => or(acc, curr))
 
-export const hashString = str => String(_hashString(str))
-
 export const addClassName = (path, jsxId) => {
   const jsxIdWithSpace = concat(jsxId, t.stringLiteral(' '))
   const attributes = path.get('attributes')
@@ -76,6 +74,8 @@ export const addClassName = (path, jsxId) => {
     t.jSXAttribute(t.jSXIdentifier('className'), className)
   )
 }
+
+export const hashString = str => String(_hashString(str))
 
 export const getScope = path =>
   (path.findParent(
@@ -254,7 +254,7 @@ export const getJSXStyleInfo = (expr, scope) => {
 export const computeClassNames = (styles, externalJsxId) => {
   if (styles.length === 0) {
     return {
-      className: externalJsxId
+      attribute: externalJsxId
     }
   }
 
@@ -280,7 +280,7 @@ export const computeClassNames = (styles, externalJsxId) => {
   if (hashes.dynamic.length === 0) {
     return {
       staticClassName,
-      className: externalJsxId
+      attribute: externalJsxId
         ? concat(t.stringLiteral(staticClassName + ' '), externalJsxId)
         : t.stringLiteral(staticClassName)
     }
@@ -308,7 +308,7 @@ export const computeClassNames = (styles, externalJsxId) => {
   if (hashes.static.length === 0) {
     return {
       staticClassName,
-      className: externalJsxId
+      attribute: externalJsxId
         ? concat(concat(externalJsxId, t.stringLiteral(' ')), dynamic)
         : dynamic
     }
@@ -318,7 +318,7 @@ export const computeClassNames = (styles, externalJsxId) => {
   // '[jsx-externalClasses] jsx-staticClasses ' + _JSXStyle.dynamic([ ['5678', [props.foo, bar, fn(props)]], ... ])
   return {
     staticClassName,
-    className: externalJsxId
+    attribute: externalJsxId
       ? concat(
           concat(externalJsxId, t.stringLiteral(` ${staticClassName} `)),
           dynamic
@@ -440,8 +440,7 @@ export const processCss = (stylesInfo, options) => {
     isGlobal
   } = stylesInfo
 
-  const staticClassName =
-    stylesInfo.staticClassName || `jsx-${hashString(hash)}`
+  const staticClassName = stylesInfo.staticClassName || `jsx-${hash}`
 
   const { splitRules } = options
 
@@ -488,7 +487,7 @@ export const processCss = (stylesInfo, options) => {
   }
 
   return {
-    hash: dynamic ? hashString(hash + staticClassName) : hashString(hash),
+    hash: dynamic ? hashString(hash + staticClassName) : hash,
     css: transformedCss,
     expressions: dynamic && expressions
   }

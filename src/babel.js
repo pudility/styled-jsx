@@ -62,8 +62,8 @@ export default function({ types: t }) {
           name !== STYLE_COMPONENT &&
           name.charAt(0) !== name.charAt(0).toUpperCase()
         ) {
-          if (state.className) {
-            addClassName(path, state.className)
+          if (state.jsxId) {
+            addClassName(path, state.jsxId)
           }
         }
 
@@ -183,11 +183,11 @@ export default function({ types: t }) {
           }
 
           if (state.styles.length > 0 || externalJsxId) {
-            const { staticClassName, className } = computeClassNames(
+            const { staticClassName, attribute } = computeClassNames(
               state.styles,
               externalJsxId
             )
-            state.className = className
+            state.jsxId = attribute
             state.staticClassName = staticClassName
           }
 
@@ -200,7 +200,7 @@ export default function({ types: t }) {
 
           if (state.hasJSXStyle && !--state.ignoreClosing && !isGlobal) {
             state.hasJSXStyle = null
-            state.className = null
+            state.jsxId = null
             state.externalJsxId = null
           }
 
